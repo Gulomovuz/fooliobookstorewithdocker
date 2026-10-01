@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Details — Folio</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ═══════════════════════════════════════════════════
+       DETAIL PAGE STYLES — Folio theme
+    ═══════════════════════════════════════════════════ */
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex; align-items: center; gap: .5rem;
+      font-family: var(--ff-mono); font-size: .72rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--dust); padding: 1.4rem 0 0;
+    }
+    .breadcrumb a { color: var(--dust); transition: color var(--transition); }
+    .breadcrumb a:hover { color: var(--amber); }
+    .breadcrumb__sep { opacity: .35; }
+    .breadcrumb__current { color: var(--ink); }
+
+    /* ── Hero Band ── */
+    .detail-hero {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 3.5rem 0 4rem;
+      margin-top: 1.5rem;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .detail-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(200,101,27,.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .detail-hero__inner {
+      max-width: var(--max-w, 1180px);
+      margin: 0 auto;
+      padding: 0 2.5rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .detail-hero__inner {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 0 1.25rem;
+      }
+    }
+
+    /* Cover */
+    .detail-cover-wrap {
+      position: relative;
+    }
+    .detail-cover {
+      width: 100%; aspect-ratio: 2/3;
+      border-radius: 6px; overflow: hidden;
+      box-shadow: 0 28px 70px rgba(0,0,0,.55), 0 6px 18px rgba(0,0,0,.3);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .detail-cover:hover {
+      transform: translateY(-5px) rotate(-0.4deg);
+      box-shadow: 0 38px 85px rgba(0,0,0,.65), 0 8px 24px rgba(0,0,0,.35);
+    }
+    .detail-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .detail-cover__badge {
+      position: absolute; top: 1rem; left: 1rem;
+      background: var(--amber); color: #fff;
+      font-size: .65rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .3rem .75rem; border-radius: 2px; z-index: 2;
+    }
+    .detail-cover__fb {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    .detail-cover__fb-title {
+      font-family: var(--ff-display);
+      font-size: 1.4rem; font-weight: 700;
+      line-height: 1.3; text-align: center;
+    }
+
+    /* Stock */
+    .detail-stock {
+      display: flex; align-items: center; gap: .5rem;
+      margin-top: 1rem; font-size: .8rem;
+    }
+    .detail-stock__dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #4CAF50; flex-shrink: 0;
+    }
+    .detail-stock__dot.low { background: #FF9800; }
+    .detail-stock__label { font-weight: 600; color: rgba(245,240,232,.8); }
+    .detail-stock__label.in-stock { color: #81C784; }
+    .detail-stock__label.low-stock { color: #FFB74D; }
+
+    /* Info column */
+    .detail-info {
+      display: flex; flex-direction: column; gap: 0;
+      padding-top: .25rem;
+    }
+
+    .detail-genre-tag {
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: .75rem;
+      display: inline-block;
+    }
+
+    .detail-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 900; line-height: 1.05;
+      color: var(--cream); margin-bottom: .6rem;
+    }
+
+    .detail-subtitle {
+      font-size: 1rem; color: rgba(245,240,232,.6);
+      margin-bottom: .4rem; font-style: italic;
+    }
+
+    .detail-author {
+      font-size: 1rem; color: rgba(245,240,232,.7);
+      margin-bottom: 1.5rem;
+    }
+    .detail-author strong {
+      color: var(--amber); font-weight: 600;
+      cursor: pointer;
+    }
+    .detail-author strong:hover { text-decoration: underline; }
+
+    /* Rating */
+    .detail-rating-row {
+      display: flex; align-items: center; gap: .9rem;
+      flex-wrap: wrap;
+      padding: 1.1rem 0;
+      border-top: 1px solid rgba(245,240,232,.12);
+      border-bottom: 1px solid rgba(245,240,232,.12);
+      margin-bottom: 1.8rem;
+    }
+    .detail-stars { color: var(--amber); font-size: 1.15rem; letter-spacing: .04em; }
+    .detail-rating-num {
+      font-family: var(--ff-display); font-size: 1.2rem;
+      font-weight: 700; color: var(--cream);
+    }
+    .detail-reviews { font-size: .8rem; color: rgba(245,240,232,.5); }
+    .detail-rating-sep { width: 1px; height: 18px; background: rgba(245,240,232,.2); }
+
+    /* Format selector (like Bookshop.org Hardcover/Ebook) */
+    .detail-formats {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+    .detail-format {
+      flex: 1; min-width: 130px;
+      border: 1.5px solid rgba(245,240,232,.2);
+      border-radius: var(--r);
+      padding: .9rem 1.1rem;
+      cursor: pointer;
+      transition: border-color .22s, background .22s;
+      background: rgba(245,240,232,.04);
+    }
+    .detail-format.active {
+      border-color: var(--amber);
+      background: rgba(200,101,27,.12);
+    }
+    .detail-format__type {
+      font-family: var(--ff-mono); font-size: .7rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(245,240,232,.5); margin-bottom: .3rem;
+    }
+    .detail-format__price {
+      font-family: var(--ff-display);
+      font-size: 1.35rem; font-weight: 800;
+      color: var(--cream);
+    }
+    .detail-format__avail {
+      font-size: .72rem; color: #81C784;
+      margin-top: .25rem; display: flex;
+      align-items: center; gap: .3rem;
+    }
+
+    /* Action buttons */
+    .detail-actions {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      margin-bottom: 1.6rem;
+    }
+    .detail-qty {
+      display: flex; align-items: center;
+      border: 1.5px solid rgba(245,240,232,.25);
+      border-radius: var(--r); overflow: hidden;
+      background: rgba(245,240,232,.06);
+    }
+    .detail-qty__btn {
+      width: 42px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--cream); background: none; border: none;
+      cursor: pointer; transition: background .2s;
+    }
+    .detail-qty__btn:hover { background: rgba(245,240,232,.1); }
+    .detail-qty__val {
+      width: 44px; text-align: center;
+      font-family: var(--ff-mono); font-size: .95rem;
+      color: var(--cream);
+      border-left: 1px solid rgba(245,240,232,.15);
+      border-right: 1px solid rgba(245,240,232,.15);
+      line-height: 50px;
+    }
+    .btn-detail-add {
+      flex: 1; min-width: 180px;
+      background: var(--amber); color: #fff;
+      padding: .9rem 1.8rem; border-radius: var(--r);
+      font-size: .92rem; font-weight: 700;
+      letter-spacing: .04em; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      transition: background .22s, transform .22s;
+    }
+    .btn-detail-add:hover { background: var(--amber-l); transform: translateY(-2px); }
+    .btn-detail-add.added { background: var(--sage); }
+    .btn-detail-wishlist {
+      padding: .9rem 1.2rem;
+      border: 1.5px solid rgba(245,240,232,.25);
+      border-radius: var(--r); background: transparent;
+      color: rgba(245,240,232,.7); font-size: .88rem;
+      cursor: pointer; transition: all .22s;
+      white-space: nowrap;
+    }
+    .btn-detail-wishlist:hover {
+      border-color: rgba(245,240,232,.6);
+      color: var(--cream);
+      background: rgba(245,240,232,.06);
+    }
+
+    /* Perks strip */
+    .detail-perks {
+      display: flex; flex-wrap: wrap; gap: 1.2rem;
+      padding: 1.2rem 0;
+      border-top: 1px solid rgba(245,240,232,.1);
+    }
+    .detail-perk {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .78rem; color: rgba(245,240,232,.55);
+    }
+    .detail-perk__icon { font-size: .95rem; }
+
+    /* ── Body Section (below the hero) ── */
+    .detail-body {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 3.5rem;
+      padding: 3.5rem 0 5rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .detail-body { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    /* Description accordion */
+    .detail-section {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.8rem;
+      margin-bottom: 1.8rem;
+    }
+    .detail-section__heading {
+      display: flex; justify-content: space-between;
+      align-items: center; cursor: pointer;
+      padding: .2rem 0;
+    }
+    .detail-section__title {
+      font-family: var(--ff-display);
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--ink);
+    }
+    .detail-section__arrow {
+      font-size: .85rem; color: var(--dust);
+      transition: transform .22s;
+    }
+    .detail-section.open .detail-section__arrow { transform: rotate(180deg); }
+    .detail-section__body {
+      font-size: .96rem; line-height: 1.78;
+      color: rgba(26,20,16,.72);
+      margin-top: 1.1rem;
+      max-width: 640px;
+    }
+
+    /* Book details table */
+    .detail-table {
+      width: 100%; border-collapse: collapse;
+      font-size: .88rem;
+    }
+    .detail-table tr { border-bottom: 1px solid var(--border); }
+    .detail-table td {
+      padding: .65rem 0;
+      vertical-align: top;
+    }
+    .detail-table td:first-child {
+      color: var(--dust); width: 40%;
+      font-family: var(--ff-mono); font-size: .78rem;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .detail-table td:last-child { color: var(--ink); font-weight: 500; }
+
+    /* Sidebar card */
+    .detail-sidebar-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.5rem;
+      position: sticky;
+      top: calc(var(--nav-h) + 1.5rem);
+    }
+    .detail-sidebar-card__title {
+      font-family: var(--ff-mono); font-size: .7rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--dust); margin-bottom: 1.1rem;
+    }
+    .detail-sidebar-price {
+      font-family: var(--ff-display); font-size: 2rem;
+      font-weight: 900; color: var(--ink); margin-bottom: .3rem;
+    }
+    .detail-sidebar-shipping {
+      font-size: .78rem; color: var(--sage);
+      margin-bottom: 1.4rem;
+    }
+    .detail-sidebar-btn {
+      width: 100%;
+      background: var(--amber); color: #fff;
+      padding: .85rem 1rem; border-radius: var(--r);
+      font-size: .9rem; font-weight: 700;
+      letter-spacing: .04em; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      transition: background .22s, transform .22s;
+      margin-bottom: .75rem;
+    }
+    .detail-sidebar-btn:hover { background: var(--amber-l); transform: translateY(-1px); }
+    .detail-sidebar-btn.added { background: var(--sage); }
+    .detail-sidebar-btn.secondary {
+      background: transparent; color: var(--ink);
+      border: 1.5px solid var(--border);
+    }
+    .detail-sidebar-btn.secondary:hover {
+      background: var(--paper); transform: translateY(-1px);
+    }
+    .detail-sidebar-sep {
+      height: 1px; background: var(--border); margin: 1.1rem 0;
+    }
+    .detail-sidebar-meta { font-size: .78rem; color: var(--dust); line-height: 1.8; }
+    .detail-sidebar-meta span { color: var(--ink); font-weight: 500; }
+
+    /* Tags row */
+    .detail-tags {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      margin-top: 1rem;
+    }
+    .detail-tag {
+      background: var(--paper); border: 1px solid var(--border);
+      border-radius: 99px; padding: .28rem .85rem;
+      font-size: .72rem; font-family: var(--ff-mono);
+      letter-spacing: .07em; color: var(--dust);
+    }
+
+    /* Related Section */
+    .related-section {
+      padding: 3.5rem 0 5rem;
+      border-top: 1px solid var(--border);
+    }
+    .related-section__eyebrow {
+      font-family: var(--ff-mono); font-size: .7rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: .4rem;
+    }
+    .related-section__title {
+      font-family: var(--ff-display);
+      font-size: 1.7rem; font-weight: 900; color: var(--ink);
+      margin-bottom: 2rem;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: 1.6rem;
+    }
+
+    /* Skeleton */
+    .skeleton-hero {
+      background: var(--ink);
+      border-radius: 8px; margin-top: 1.5rem;
+      padding: 3.5rem 2.5rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .skel {
+      background: rgba(245,240,232,.1); border-radius: 4px;
+    }
+
+    /* Error */
+    .detail-error {
+      text-align: center; padding: 6rem 2rem;
+    }
+    .detail-error__icon { font-size: 3rem; margin-bottom: 1rem; opacity:.4; }
+    .detail-error__title {
+      font-family: var(--ff-display); font-size: 1.8rem;
+      font-weight: 700; margin-bottom: .5rem;
+    }
+    .detail-error__sub { color: var(--dust); margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body data-page="details">
+
+  <header class="nav"></header>
+
+  <div class="container">
+    <nav class="breadcrumb" id="breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="breadcrumb__sep">/</span>
+      <span id="breadcrumbGenre" style="color:var(--dust)">…</span>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current" id="breadcrumbTitle">Loading…</span>
+    </nav>
+  </div>
+
+  <!-- Main content injected here -->
+  <div id="pageRoot"></div>
+
+    <!-- ══ NEWSLETTER BAND ══ -->
+  <div class="footer-newsletter">
+    <div class="footer-newsletter__copy">
+      <div class="footer-newsletter__eyebrow">Stay in the story</div>
+      <div class="footer-newsletter__heading">Get weekly book picks<br>sent to your inbox.</div>
+    </div>
+    <form class="footer-newsletter__form" onsubmit="handleNewsletterSubmit(event)">
+      <input class="footer-newsletter__input" type="email" placeholder="your@email.com" id="newsletterEmail" />
+      <button class="footer-newsletter__btn" type="submit">Subscribe →</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="footer-main">
+      <div>
+        <a href="index.html" class="footer-brand__logo">Fo<span>l</span>io</a>
+        <p class="footer-brand__tagline">Curated books across every genre — fiction, science, history, self-help, and more. Free shipping on orders over $35.</p>
+        <div class="footer-social">
+          <a class="footer-social__link" href="https://www.instagram.com/foliobookstore/" target="_blank" rel="noopener noreferrer" title="Instagram">📷</a>
+          <a class="footer-social__link" href="#" title="Twitter">𝕏</a>
+          <a class="footer-social__link" href="#" title="Facebook">f</a>
+          <a class="footer-social__link" href="#" title="Pinterest">📌</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col__heading">Browse</div>
+        <ul class="footer-col__list">
+          <li><a href="index.html">All Books</a></li>
+          <li><a href="index.html">Fiction</a></li>
+          <li><a href="index.html">Sci-Fi</a></li>
+          <li><a href="index.html">Self-Help</a></li>
+          <li><a href="index.html">History</a></li>
+          <li><a href="index.html">Memoir</a></li>
+          <li><a href="index.html">Fantasy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Account</div>
+        <ul class="footer-col__list">
+          <li><a href="login.html">Sign In</a></li>
+          <li><a href="register.html">Create Account</a></li>
+          <li><a href="cart.html">Your Cart</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Help</div>
+        <ul class="footer-col__list">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-trust">
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🔒</span>
+        <div class="footer-trust__label"><strong>Secure Checkout</strong>SSL encrypted payments</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🚚</span>
+        <div class="footer-trust__label"><strong>Free Shipping</strong>On all orders over $35</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">↩️</span>
+        <div class="footer-trust__label"><strong>30-Day Returns</strong>Hassle-free returns</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">⭐</span>
+        <div class="footer-trust__label"><strong>Top Rated</strong>4.9 / 5 from 12,000+ readers</div>
+      </div>
+      <div class="footer-payments">
+        <span class="footer-payments__label">Payments</span>
+        <span class="footer-payment-badge">VISA</span>
+        <span class="footer-payment-badge">MC</span>
+        <span class="footer-payment-badge">AMEX</span>
+        <span class="footer-payment-badge">PayPal</span>
+        <span class="footer-payment-badge">Stripe</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Folio Bookstore · All rights reserved</span>
+      <div class="footer-bottom__links">
+        <a href="#">Terms of Use</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const em = document.getElementById("newsletterEmail").value.trim();
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showToast("Please enter a valid email."); return; }
+      showToast("📬 You're subscribed! Thanks for joining Folio.");
+      document.getElementById("newsletterEmail").value = "";
+    }
+  </script>
+
+
+  <script src="script.js"></script>
+  <script>
+    /* ── Helpers ───────────────────────── */
+    const STOCK_MAP = {
+      1:{qty:14,cls:"in-stock",dot:"",label:"In Stock"},
+      2:{qty:32,cls:"in-stock",dot:"",label:"In Stock"},
+      3:{qty:7, cls:"low-stock",dot:"low",label:"Only 7 left"},
+      4:{qty:21,cls:"in-stock",dot:"",label:"In Stock"},
+      5:{qty:5, cls:"low-stock",dot:"low",label:"Only 5 left"},
+      6:{qty:18,cls:"in-stock",dot:"",label:"In Stock"},
+      7:{qty:11,cls:"in-stock",dot:"",label:"In Stock"},
+      8:{qty:3, cls:"low-stock",dot:"low",label:"Only 3 left"},
+      9:{qty:24,cls:"in-stock",dot:"",label:"In Stock"},
+      10:{qty:9,cls:"in-stock",dot:"",label:"In Stock"},
+      11:{qty:42,cls:"in-stock",dot:"",label:"In Stock"},
+      12:{qty:6,cls:"low-stock",dot:"low",label:"Only 6 left"},
+    };
+    function getStock(id){ return STOCK_MAP[id] || {qty:15,cls:"in-stock",dot:"",label:"In Stock"}; }
+
+    function renderStarsFull(r){
+      const full = Math.floor(r), half = r%1>=.5;
+      return "★".repeat(full)+(half?"½":"")+"☆".repeat(5-full-(half?1:0));
+    }
+
+    /* ── Cover HTML helper ─────────────── */
+    function coverHTML(book, klass="detail-cover"){
+      const bg  = book.cover?.bg  || book.coverBg  || "#2D4A5F";
+      const acc = book.cover?.accent || book.coverAccent || "#5B9BBF";
+      return `<div class="${klass}" style="${!book.image?'background:'+bg:''}">
+        ${book.image
+          ? `<img src="${book.image}" alt="${book.title}" />`
+          : `<div class="detail-cover__fb" style="background:${bg};color:${acc}">
+               <div class="detail-cover__fb-title">${book.title}</div>
+             </div>`}
+        ${book.badge ? `<span class="detail-cover__badge">${book.badge}</span>` : ""}
+      </div>`;
+    }
+
+    /* ── Page renderer ─────────────────── */
+    function renderDetailPage(book){
+      const stock = getStock(book.id);
+      const ebook = +(book.price * .72).toFixed(2);
+      let qty = 1;
+      let activeFormat = "paperback";
+
+      document.getElementById("breadcrumbTitle").textContent = book.title;
+      document.getElementById("breadcrumbGenre").textContent = book.genre;
+      document.title = `${book.title} — Folio`;
+
+      document.getElementById("pageRoot").innerHTML = `
+        <!-- ══ HERO BAND ══ -->
+        <div class="detail-hero">
+          <div class="detail-hero__inner container">
+
+            <!-- Left: Cover -->
+            <div class="detail-cover-wrap">
+              ${coverHTML(book)}
+              <div class="detail-stock">
+                <span class="detail-stock__dot ${stock.dot}"></span>
+                <span class="detail-stock__label ${stock.cls}">${stock.label}</span>
+              </div>
+            </div>
+
+            <!-- Right: Info -->
+            <div class="detail-info">
+              <span class="detail-genre-tag">${book.genre}</span>
+              <h1 class="detail-title">${book.title}</h1>
+              <p class="detail-author">by <strong>${book.author}</strong></p>
+
+              <!-- Rating -->
+              <div class="detail-rating-row">
+                <span class="detail-stars">${renderStarsFull(book.rating)}</span>
+                <span class="detail-rating-num">${book.rating}</span>
+                <span class="detail-rating-sep"></span>
+                <span class="detail-reviews">${book.reviews.toLocaleString()} reviews</span>
+              </div>
+
+              <!-- Format selector -->
+              <div class="detail-formats" id="formatPicker">
+                <div class="detail-format active" data-format="paperback">
+                  <div class="detail-format__type">📖 Paperback</div>
+                  <div class="detail-format__price">$${book.price.toFixed(2)}</div>
+                  <div class="detail-format__avail">✓ Available</div>
+                </div>
+                <div class="detail-format" data-format="ebook">
+                  <div class="detail-format__type">📱 E-Book</div>
+                  <div class="detail-format__price">$${ebook.toFixed(2)}</div>
+                  <div class="detail-format__avail">✓ Available</div>
+                </div>
+              </div>
+
+              <!-- Qty + Add to Cart -->
+              <div class="detail-actions">
+                <div class="detail-qty">
+                  <button class="detail-qty__btn" id="qtyDec">−</button>
+                  <span class="detail-qty__val" id="qtyVal">1</span>
+                  <button class="detail-qty__btn" id="qtyInc">+</button>
+                </div>
+                <button class="btn-detail-add" id="heroAddBtn">
+                  🛒 Add to Cart
+                </button>
+                <button class="btn-detail-wishlist" id="wishlistBtn">♡ Wishlist</button>
+              </div>
+
+              <!-- Perks -->
+              <div class="detail-perks">
+                <div class="detail-perk"><span class="detail-perk__icon">🚚</span>Free shipping over $35</div>
+                <div class="detail-perk"><span class="detail-perk__icon">↩️</span>30-day returns</div>
+                <div class="detail-perk"><span class="detail-perk__icon">🔒</span>Secure checkout</div>
+                <div class="detail-perk"><span class="detail-perk__icon">📦</span>Ships in 1–3 days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ BODY ══ -->
+        <div class="container">
+          <div class="detail-body">
+
+            <!-- Left: Description + Details -->
+            <div>
+              <!-- Description -->
+              <div class="detail-section open" id="sec-desc">
+                <div class="detail-section__heading" data-target="sec-desc">
+                  <span class="detail-section__title">Description</span>
+                  <span class="detail-section__arrow">▾</span>
+                </div>
+                <div class="detail-section__body">
+                  ${book.description || "A compelling read that will keep you engaged from the first page to the last."}
+                </div>
+              </div>
+
+              <!-- Book details -->
+              <div class="detail-section open" id="sec-info">
+                <div class="detail-section__heading" data-target="sec-info">
+                  <span class="detail-section__title">Book Details</span>
+                  <span class="detail-section__arrow">▾</span>
+                </div>
+                <div class="detail-section__body">
+                  <table class="detail-table">
+                    <tr><td>Author</td><td>${book.author}</td></tr>
+                    <tr><td>Genre</td><td>${book.genre}</td></tr>
+                    <tr><td>Format</td><td>Paperback</td></tr>
+                    <tr><td>Language</td><td>English</td></tr>
+                    <tr><td>Rating</td><td>${book.rating} / 5 (${book.reviews.toLocaleString()} reviews)</td></tr>
+                    <tr><td>Price</td><td>$${book.price.toFixed(2)}</td></tr>
+                    <tr><td>Availability</td><td>${stock.label}</td></tr>
+                  </table>
+
+                  <div class="detail-tags">
+                    <span class="detail-tag">${book.genre}</span>
+                    ${book.badge ? `<span class="detail-tag">${book.badge}</span>` : ""}
+                    <span class="detail-tag">Paperback</span>
+                    <span class="detail-tag">English</span>
+                    <span class="detail-tag">Free Returns</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Sticky sidebar -->
+            <aside class="detail-sidebar-card">
+              <div class="detail-sidebar-card__title">Purchase Options</div>
+              <div class="detail-sidebar-price" id="sidebarPrice">$${book.price.toFixed(2)}</div>
+              <div class="detail-sidebar-shipping">✓ Free shipping on orders over $35</div>
+
+              <button class="detail-sidebar-btn" id="sidebarAddBtn">
+                🛒 Add to Cart
+              </button>
+              <button class="detail-sidebar-btn secondary" onclick="window.location.href='cart.html'">
+                View Cart →
+              </button>
+
+              <div class="detail-sidebar-sep"></div>
+              <div class="detail-sidebar-meta">
+                <div>Author: <span>${book.author}</span></div>
+                <div>Genre: <span>${book.genre}</span></div>
+                <div>Stock: <span>${stock.label}</span></div>
+                <div>Ships in: <span>1–3 business days</span></div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <!-- ══ RELATED ══ -->
+        <div class="container">
+          <section class="related-section" id="relatedSection" style="display:none;">
+            <div class="related-section__eyebrow">Explore More</div>
+            <div class="related-section__title">You may also like</div>
+            <div class="related-grid" id="relatedGrid"></div>
+          </section>
+        </div>
+      `;
+
+      /* ── Interaction wiring ── */
+
+      // Format picker
+      let currentPrice = book.price;
+      document.getElementById("formatPicker").addEventListener("click", e => {
+        const fmt = e.target.closest(".detail-format");
+        if (!fmt) return;
+        document.querySelectorAll(".detail-format").forEach(f => f.classList.remove("active"));
+        fmt.classList.add("active");
+        activeFormat = fmt.dataset.format;
+        currentPrice = activeFormat === "ebook" ? ebook : book.price;
+        document.getElementById("sidebarPrice").textContent = `$${currentPrice.toFixed(2)}`;
+      });
+
+      // Qty control
+      const qtyValEl = document.getElementById("qtyVal");
+      document.getElementById("qtyDec").addEventListener("click", () => {
+        if (qty > 1) { qty--; qtyValEl.textContent = qty; }
+      });
+      document.getElementById("qtyInc").addEventListener("click", () => {
+        if (qty < 10) { qty++; qtyValEl.textContent = qty; }
+      });
+
+      // Add to cart — hero button
+      function doAddToCart(btn) {
+        const cart = getCart();
+        const existing = cart.find(i => Number(i.id) === Number(book.id));
+        if (existing) existing.qty += qty;
+        else cart.push({ id: Number(book.id), qty });
+        saveCart(cart);
+        syncCartToBackend();
+        showToast(`📚 "${book.title}" × ${qty} added to cart`);
+        btn.classList.add("added");
+        const orig = btn.innerHTML;
+        btn.innerHTML = "✓ Added to Cart";
+        setTimeout(() => { btn.classList.remove("added"); btn.innerHTML = orig; }, 1500);
+      }
+      document.getElementById("heroAddBtn").addEventListener("click", e => doAddToCart(e.currentTarget));
+      document.getElementById("sidebarAddBtn").addEventListener("click", e => doAddToCart(e.currentTarget));
+
+      // Wishlist toggle
+      const wBtn = document.getElementById("wishlistBtn");
+      let wishlisted = false;
+      wBtn.addEventListener("click", () => {
+        wishlisted = !wishlisted;
+        wBtn.textContent = wishlisted ? "♥ Wishlisted" : "♡ Wishlist";
+        wBtn.style.color = wishlisted ? "var(--amber)" : "";
+        wBtn.style.borderColor = wishlisted ? "var(--amber)" : "";
+        showToast(wishlisted ? `♥ Added to wishlist` : `Removed from wishlist`);
+      });
+
+      // Accordion sections
+      document.querySelectorAll(".detail-section__heading").forEach(heading => {
+        heading.addEventListener("click", () => {
+          const sec = document.getElementById(heading.dataset.target);
+          sec.classList.toggle("open");
+          const body = sec.querySelector(".detail-section__body");
+          body.style.display = sec.classList.contains("open") ? "block" : "none";
+        });
+      });
+    }
+
+    /* ── Related books ─────────────────── */
+    function renderRelatedBooks(currentBook, allBooks) {
+      const related = allBooks
+        .filter(b => b.genre === currentBook.genre && b.id !== currentBook.id)
+        .slice(0, 4);
+      if (related.length === 0) return;
+      document.getElementById("relatedSection").style.display = "block";
+      const grid = document.getElementById("relatedGrid");
+      grid.innerHTML = related.map(book => bookCardHTML(book)).join("");
+      grid.querySelectorAll(".btn-add").forEach(btn => {
+        btn.addEventListener("click", () => {
+          addToCart(Number(btn.dataset.bookId));
+          btn.classList.add("added"); btn.innerHTML = "✓ Added";
+          setTimeout(() => { btn.classList.remove("added"); btn.innerHTML = "<span>+</span> Add to Cart"; }, 1200);
+        });
+      });
+    }
+
+    /* ── Init ──────────────────────────── */
+    async function initDetails() {
+      renderNav("details");
+      const bookId = Number(new URLSearchParams(window.location.search).get("id"));
+
+      if (!bookId) {
+        document.getElementById("pageRoot").innerHTML = `
+          <div class="container"><div class="detail-error">
+            <div class="detail-error__icon">📚</div>
+            <div class="detail-error__title">No book selected</div>
+            <p class="detail-error__sub">Please go back and pick a book.</p>
+            <a href="index.html" class="btn-browse">Browse Books</a>
+          </div></div>`;
+        return;
+      }
+
+      // Skeleton while loading
+      document.getElementById("pageRoot").innerHTML = `
+        <div class="skeleton-hero container">
+          <div class="skel" style="aspect-ratio:2/3;width:100%;border-radius:6px;"></div>
+          <div style="display:flex;flex-direction:column;gap:1rem;padding-top:.5rem;">
+            <div class="skel" style="height:12px;width:70px;"></div>
+            <div class="skel" style="height:42px;width:85%;"></div>
+            <div class="skel" style="height:18px;width:45%;"></div>
+            <div class="skel" style="height:1px;width:100%;margin:6px 0;"></div>
+            <div class="skel" style="height:72px;width:100%;"></div>
+            <div class="skel" style="height:50px;width:55%;border-radius:4px;"></div>
+          </div>
+        </div>`;
+
+      await loadBooks();
+      const book = BOOKS.find(b => Number(b.id) === bookId);
+
+      if (!book) {
+        document.getElementById("pageRoot").innerHTML = `
+          <div class="container"><div class="detail-error">
+            <div class="detail-error__icon">🔍</div>
+            <div class="detail-error__title">Book not found</div>
+            <p class="detail-error__sub">We couldn't find book #${bookId}.</p>
+            <a href="index.html" class="btn-browse">Browse Books</a>
+          </div></div>`;
+        return;
+      }
+
+      renderDetailPage(book);
+      renderRelatedBooks(book, BOOKS);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initDetails();
+      updateCartBadge();
+    });
+  </script>
+</body>
+</html>

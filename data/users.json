@@ -1,0 +1,14 @@
+[
+  {
+    "id": "u_demo",
+    "email": "demo@folio.com",
+    "password": "reader123",
+    "name": "Alex Reader"
+  },
+  {
+    "id": "u_test",
+    "email": "test@example.com",
+    "password": "password",
+    "name": "Sam Books"
+  }
+]

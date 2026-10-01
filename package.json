@@ -1,0 +1,15 @@
+{
+  "name": "folio-bookstore-final",
+  "version": "1.0.0",
+  "description": "Full-stack Folio Bookstore with HTML/CSS/JS frontend and Node.js/Express backend",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.2"
+  }
+}

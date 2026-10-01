@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — Folio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="register">
+
+  <header class="nav"></header>
+
+  <main class="auth-layout">
+    <!-- Left Panel -->
+    <div class="auth-panel--left">
+      <blockquote class="auth-panel__quote">
+        "Not all those who wander are <em>lost</em> — but all who read are found."
+      </blockquote>
+      <div class="auth-panel__attribution">— Folio</div>
+    </div>
+
+    <!-- Right Panel — Form -->
+    <div class="auth-panel--right">
+      <div class="auth-form">
+        <div class="auth-form__logo">Fo<span>l</span>io</div>
+        <h1 class="auth-form__title">Create an account</h1>
+        <p class="auth-form__sub">Join Folio and start your reading journey.</p>
+
+        <!-- Error message -->
+        <div id="registerError" style="display:none;color:#C0392B;font-size:.85rem;margin-bottom:1rem;padding:.75rem 1rem;background:rgba(192,57,43,.08);border-radius:4px;border-left:3px solid #C0392B;">
+          Something went wrong. Please try again.
+        </div>
+
+        <!-- Success message -->
+        <div id="registerSuccess" style="display:none;color:#27AE60;font-size:.85rem;margin-bottom:1rem;padding:.75rem 1rem;background:rgba(39,174,96,.08);border-radius:4px;border-left:3px solid #27AE60;">
+          Account created! Redirecting you to sign in…
+        </div>
+
+        <form id="registerForm" novalidate>
+          <div class="form-group">
+            <label for="nameInput">Full Name</label>
+            <input type="text" id="nameInput" placeholder="Alex Reader" autocomplete="name" />
+            <div class="form-error">Please enter your full name.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="emailInput">Email Address</label>
+            <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+            <div class="form-error">Please enter a valid email address.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="passInput">Password</label>
+            <input type="password" id="passInput" placeholder="Min. 6 characters" autocomplete="new-password" />
+            <div class="form-error">Password must be at least 6 characters.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassInput">Confirm Password</label>
+            <input type="password" id="confirmPassInput" placeholder="Re-enter password" autocomplete="new-password" />
+            <div class="form-error">Passwords do not match.</div>
+          </div>
+
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+
+        <div class="auth-form__footer">
+          Already have an account? <a href="login.html">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderNav("register");
+      if (getSession()) { window.location.href = "index.html"; return; }
+
+      const form = document.getElementById("registerForm");
+      form?.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const nameInput    = document.getElementById("nameInput");
+        const emailInput   = document.getElementById("emailInput");
+        const passInput    = document.getElementById("passInput");
+        const confirmInput = document.getElementById("confirmPassInput");
+
+        document.querySelectorAll(".form-group").forEach(g => g.classList.remove("has-error"));
+        document.getElementById("registerError").style.display   = "none";
+        document.getElementById("registerSuccess").style.display = "none";
+
+        let valid = true;
+
+        if (!nameInput.value.trim()) {
+          nameInput.closest(".form-group").classList.add("has-error");
+          valid = false;
+        }
+        if (!emailInput.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
+          emailInput.closest(".form-group").classList.add("has-error");
+          valid = false;
+        }
+        if (passInput.value.length < 6) {
+          passInput.closest(".form-group").classList.add("has-error");
+          valid = false;
+        }
+        if (confirmInput.value !== passInput.value) {
+          confirmInput.closest(".form-group").classList.add("has-error");
+          valid = false;
+        }
+        if (!valid) return;
+
+        const btn = form.querySelector("button[type='submit']");
+        btn.textContent = "Creating account…";
+        btn.disabled = true;
+
+        try {
+          await api("/api/register", {
+            method: "POST",
+            body: JSON.stringify({
+              name:     nameInput.value.trim(),
+              email:    emailInput.value.trim(),
+              password: passInput.value
+            })
+          });
+
+          document.getElementById("registerSuccess").style.display = "block";
+          setTimeout(() => window.location.href = "login.html", 1500);
+        } catch (err) {
+          const errEl = document.getElementById("registerError");
+          errEl.textContent = err.message || "Could not create account. Please try again.";
+          errEl.style.display = "block";
+          btn.textContent = "Create Account";
+          btn.disabled = false;
+        }
+      });
+    });
+  </script>
+
+  <!-- ══ NEWSLETTER BAND ══ -->
+  <div class="footer-newsletter">
+    <div class="footer-newsletter__copy">
+      <div class="footer-newsletter__eyebrow">Stay in the story</div>
+      <div class="footer-newsletter__heading">Get weekly book picks<br>sent to your inbox.</div>
+    </div>
+    <form class="footer-newsletter__form" onsubmit="handleNewsletterSubmit(event)">
+      <input class="footer-newsletter__input" type="email" placeholder="your@email.com" id="newsletterEmail" />
+      <button class="footer-newsletter__btn" type="submit">Subscribe →</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="footer-main">
+      <div>
+        <a href="index.html" class="footer-brand__logo">Fo<span>l</span>io</a>
+        <p class="footer-brand__tagline">Curated books across every genre — fiction, science, history, self-help, and more. Free shipping on orders over $35.</p>
+        <div class="footer-social">
+          <a class="footer-social__link" href="https://www.instagram.com/foliobookstore/" target="_blank" rel="noopener noreferrer" title="Instagram">📷</a>
+          <a class="footer-social__link" href="#" title="Twitter">𝕏</a>
+          <a class="footer-social__link" href="#" title="Facebook">f</a>
+          <a class="footer-social__link" href="#" title="Pinterest">📌</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col__heading">Browse</div>
+        <ul class="footer-col__list">
+          <li><a href="index.html">All Books</a></li>
+          <li><a href="index.html">Fiction</a></li>
+          <li><a href="index.html">Sci-Fi</a></li>
+          <li><a href="index.html">Self-Help</a></li>
+          <li><a href="index.html">History</a></li>
+          <li><a href="index.html">Memoir</a></li>
+          <li><a href="index.html">Fantasy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Account</div>
+        <ul class="footer-col__list">
+          <li><a href="login.html">Sign In</a></li>
+          <li><a href="register.html">Create Account</a></li>
+          <li><a href="cart.html">Your Cart</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Help</div>
+        <ul class="footer-col__list">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-trust">
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🔒</span>
+        <div class="footer-trust__label"><strong>Secure Checkout</strong>SSL encrypted payments</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🚚</span>
+        <div class="footer-trust__label"><strong>Free Shipping</strong>On all orders over $35</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">↩️</span>
+        <div class="footer-trust__label"><strong>30-Day Returns</strong>Hassle-free returns</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">⭐</span>
+        <div class="footer-trust__label"><strong>Top Rated</strong>4.9 / 5 from 12,000+ readers</div>
+      </div>
+      <div class="footer-payments">
+        <span class="footer-payments__label">Payments</span>
+        <span class="footer-payment-badge">VISA</span>
+        <span class="footer-payment-badge">MC</span>
+        <span class="footer-payment-badge">AMEX</span>
+        <span class="footer-payment-badge">PayPal</span>
+        <span class="footer-payment-badge">Stripe</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Folio Bookstore · All rights reserved</span>
+      <div class="footer-bottom__links">
+        <a href="#">Terms of Use</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const em = document.getElementById("newsletterEmail").value.trim();
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showToast("Please enter a valid email."); return; }
+      showToast("📬 You're subscribed! Thanks for joining Folio.");
+      document.getElementById("newsletterEmail").value = "";
+    }
+  </script>
+
+</body>
+</html>

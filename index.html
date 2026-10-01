@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio — Bookstore</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="index">
+
+  <!-- Navigation -->
+  <header class="nav"></header>
+
+  <!-- Hero -->
+<section class="hero">
+
+  <!-- 🔥 ADD THIS VIDEO HERE -->
+  <video autoplay muted loop playsinline class="hero-video">
+    <source src="videos/books.mp4" type="video/mp4">
+  </video>
+
+  <div class="hero__eyebrow">Spring Collection 2025</div>
+  <h1 class="hero__title">
+    Stories worth<br><em>losing yourself</em><br>in.
+  </h1>
+  <p class="hero__sub">
+    Curated books across every genre — fiction, science, history, self-help, and more.
+    Free shipping on orders over $35.
+  </p>
+
+</section>
+
+  <!-- Filter Bar -->
+  <div class="container">
+    <div class="filter-bar">
+      <span class="filter-bar__label">Filter:</span>
+      <button class="filter-pill active" data-genre="All">All</button>
+      <button class="filter-pill" data-genre="Fiction">Fiction</button>
+      <button class="filter-pill" data-genre="Sci-Fi">Sci-Fi</button>
+      <button class="filter-pill" data-genre="Self-Help">Self-Help</button>
+      <button class="filter-pill" data-genre="History">History</button>
+      <button class="filter-pill" data-genre="Fantasy">Fantasy</button>
+      <button class="filter-pill" data-genre="Memoir">Memoir</button>
+      <div class="filter-bar__sort">
+        <span class="filter-bar__label">Sort:</span>
+        <select id="sortSelect">
+          <option value="default">Featured</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="rating">Top Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Book Grid -->
+    <div class="books-grid" id="booksGrid"></div>
+  </div>
+
+  <!-- Footer -->
+    <!-- ══ NEWSLETTER BAND ══ -->
+  <div class="footer-newsletter">
+    <div class="footer-newsletter__copy">
+      <div class="footer-newsletter__eyebrow">Stay in the story</div>
+      <div class="footer-newsletter__heading">Get weekly book picks<br>sent to your inbox.</div>
+    </div>
+    <form class="footer-newsletter__form" onsubmit="handleNewsletterSubmit(event)">
+      <input class="footer-newsletter__input" type="email" placeholder="your@email.com" id="newsletterEmail" />
+      <button class="footer-newsletter__btn" type="submit">Subscribe →</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="footer-main">
+      <div>
+        <a href="index.html" class="footer-brand__logo">Fo<span>l</span>io</a>
+        <p class="footer-brand__tagline">Curated books across every genre — fiction, science, history, self-help, and more. Free shipping on orders over $35.</p>
+        <div class="footer-social">
+          <a class="footer-social__link" href="https://www.instagram.com/foliobookstore/" target="_blank" rel="noopener noreferrer" title="Instagram">📷</a>
+          <a class="footer-social__link" href="#" title="Twitter">𝕏</a>
+          <a class="footer-social__link" href="#" title="Facebook">f</a>
+          <a class="footer-social__link" href="#" title="Pinterest">📌</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col__heading">Browse</div>
+        <ul class="footer-col__list">
+          <li><a href="index.html">All Books</a></li>
+          <li><a href="index.html">Fiction</a></li>
+          <li><a href="index.html">Sci-Fi</a></li>
+          <li><a href="index.html">Self-Help</a></li>
+          <li><a href="index.html">History</a></li>
+          <li><a href="index.html">Memoir</a></li>
+          <li><a href="index.html">Fantasy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Account</div>
+        <ul class="footer-col__list">
+          <li><a href="login.html">Sign In</a></li>
+          <li><a href="register.html">Create Account</a></li>
+          <li><a href="cart.html">Your Cart</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Help</div>
+        <ul class="footer-col__list">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-trust">
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🔒</span>
+        <div class="footer-trust__label"><strong>Secure Checkout</strong>SSL encrypted payments</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🚚</span>
+        <div class="footer-trust__label"><strong>Free Shipping</strong>On all orders over $35</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">↩️</span>
+        <div class="footer-trust__label"><strong>30-Day Returns</strong>Hassle-free returns</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">⭐</span>
+        <div class="footer-trust__label"><strong>Top Rated</strong>4.9 / 5 from 12,000+ readers</div>
+      </div>
+      <div class="footer-payments">
+        <span class="footer-payments__label">Payments</span>
+        <span class="footer-payment-badge">VISA</span>
+        <span class="footer-payment-badge">MC</span>
+        <span class="footer-payment-badge">AMEX</span>
+        <span class="footer-payment-badge">PayPal</span>
+        <span class="footer-payment-badge">Stripe</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Folio Bookstore · All rights reserved</span>
+      <div class="footer-bottom__links">
+        <a href="#">Terms of Use</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const em = document.getElementById("newsletterEmail").value.trim();
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showToast("Please enter a valid email."); return; }
+      showToast("📬 You're subscribed! Thanks for joining Folio.");
+      document.getElementById("newsletterEmail").value = "";
+    }
+  </script>
+
+
+  <script src="script.js"></script>
+</body>
+</html>

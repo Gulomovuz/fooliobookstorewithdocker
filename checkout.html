@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Folio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="checkout">
+
+  <header class="nav"></header>
+
+  <div class="page-header">
+    <div class="container">
+      <div class="page-header__label">Final Step</div>
+      <h1 class="page-header__title">Checkout</h1>
+      <div class="page-header__line"></div>
+    </div>
+  </div>
+
+  <div class="container" id="checkoutContent">
+
+    <!-- Step indicators -->
+    <div class="checkout-steps">
+      <div class="step done">
+        <span class="step__num">✓</span> Cart
+        <span class="step__arrow">›</span>
+      </div>
+      <div class="step active">
+        <span class="step__num">2</span> Shipping & Payment
+        <span class="step__arrow">›</span>
+      </div>
+      <div class="step">
+        <span class="step__num">3</span> Confirmation
+      </div>
+    </div>
+
+    <div class="checkout-layout">
+
+      <!-- Left: Forms -->
+      <div>
+        <form id="checkoutForm" novalidate>
+
+          <!-- Shipping Info -->
+          <div class="checkout-card">
+            <div class="checkout-card__title">
+              <span class="checkout-card__icon">📦</span> Shipping Information
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" id="firstName" required placeholder="Alex" />
+                <div class="form-error">Required</div>
+              </div>
+              <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" id="lastName" required placeholder="Reader" />
+                <div class="form-error">Required</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email Address *</label>
+              <input type="email" id="checkoutEmail" required placeholder="you@example.com" />
+              <div class="form-error">Required</div>
+            </div>
+
+            <div class="form-group">
+              <label>Street Address *</label>
+              <input type="text" id="address" required placeholder="123 Library Lane" />
+              <div class="form-error">Required</div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>City *</label>
+                <input type="text" id="city" required placeholder="Seoul" />
+                <div class="form-error">Required</div>
+              </div>
+              <div class="form-group">
+                <label>Postal Code *</label>
+                <input type="text" id="postal" required placeholder="12345" />
+                <div class="form-error">Required</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Country</label>
+              <select id="country">
+                <option>South Korea</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Japan</option>
+                <option>Australia</option>
+                <option>Canada</option>
+                <option>Germany</option>
+                <option>France</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Payment -->
+          <div class="checkout-card">
+            <div class="checkout-card__title">
+              <span class="checkout-card__icon">💳</span> Payment Method
+            </div>
+
+            <div class="payment-methods">
+              <label class="payment-method selected" data-method="card">
+                <span class="payment-method__icon">💳</span> Credit Card
+              </label>
+              <label class="payment-method" data-method="paypal">
+                <span class="payment-method__icon">🅿️</span> PayPal
+              </label>
+              <label class="payment-method" data-method="apple">
+                <span class="payment-method__icon"></span> Apple Pay
+              </label>
+            </div>
+
+            <div id="cardFields">
+              <div class="form-group">
+                <label>Card Number *</label>
+                <input type="text" id="cardNumber" required placeholder="4242 4242 4242 4242"
+                  maxlength="19"
+                  oninput="this.value=this.value.replace(/[^\d]/g,'').replace(/(.{4})/g,'$1 ').trim()" />
+                <div class="form-error">Required</div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Expiry Date *</label>
+                  <input type="text" id="expiry" required placeholder="MM / YY" maxlength="7"
+                    oninput="this.value=this.value.replace(/[^\d]/g,'').replace(/(\d{2})(\d)/,'$1 / $2')" />
+                  <div class="form-error">Required</div>
+                </div>
+                <div class="form-group">
+                  <label>CVV *</label>
+                  <input type="text" id="cvv" required placeholder="123" maxlength="4"
+                    oninput="this.value=this.value.replace(/[^\d]/g,'')" />
+                  <div class="form-error">Required</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cardholder Name *</label>
+                <input type="text" id="cardName" required placeholder="ALEX READER" />
+                <div class="form-error">Required</div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+
+        <!-- Pay Button -->
+        <button class="btn-pay" id="payBtn">
+          🔒 Place Order
+        </button>
+        <p class="secure-note">🔐 Simulated payment — no real charges will occur</p>
+      </div>
+
+      <!-- Right: Order Summary Sidebar -->
+      <aside id="checkoutSidebar" class="order-summary">
+        <div class="order-summary__title">Your Order</div>
+        <div class="mini-items" id="miniItems">
+          <!-- Rendered by JS -->
+        </div>
+        <div style="border-top:1px solid var(--border);margin:1rem 0"></div>
+        <div class="summary-row"><span>Subtotal</span><span id="coSubtotal">—</span></div>
+        <div class="summary-row"><span>Shipping</span><span id="coShipping">—</span></div>
+        <div class="summary-row"><span>Tax (8%)</span><span id="coTax">—</span></div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="coTotal" style="font-family:var(--ff-display)">—</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+    <!-- ══ NEWSLETTER BAND ══ -->
+  <div class="footer-newsletter">
+    <div class="footer-newsletter__copy">
+      <div class="footer-newsletter__eyebrow">Stay in the story</div>
+      <div class="footer-newsletter__heading">Get weekly book picks<br>sent to your inbox.</div>
+    </div>
+    <form class="footer-newsletter__form" onsubmit="handleNewsletterSubmit(event)">
+      <input class="footer-newsletter__input" type="email" placeholder="your@email.com" id="newsletterEmail" />
+      <button class="footer-newsletter__btn" type="submit">Subscribe →</button>
+    </form>
+  </div>
+
+  <footer>
+    <div class="footer-main">
+      <div>
+        <a href="index.html" class="footer-brand__logo">Fo<span>l</span>io</a>
+        <p class="footer-brand__tagline">Curated books across every genre — fiction, science, history, self-help, and more. Free shipping on orders over $35.</p>
+        <div class="footer-social">
+          <a class="footer-social__link" href="https://www.instagram.com/foliobookstore/" target="_blank" rel="noopener noreferrer" title="Instagram">📷</a>
+          <a class="footer-social__link" href="#" title="Twitter">𝕏</a>
+          <a class="footer-social__link" href="#" title="Facebook">f</a>
+          <a class="footer-social__link" href="#" title="Pinterest">📌</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col__heading">Browse</div>
+        <ul class="footer-col__list">
+          <li><a href="index.html">All Books</a></li>
+          <li><a href="index.html">Fiction</a></li>
+          <li><a href="index.html">Sci-Fi</a></li>
+          <li><a href="index.html">Self-Help</a></li>
+          <li><a href="index.html">History</a></li>
+          <li><a href="index.html">Memoir</a></li>
+          <li><a href="index.html">Fantasy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Account</div>
+        <ul class="footer-col__list">
+          <li><a href="login.html">Sign In</a></li>
+          <li><a href="register.html">Create Account</a></li>
+          <li><a href="cart.html">Your Cart</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col__heading">Help</div>
+        <ul class="footer-col__list">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-trust">
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🔒</span>
+        <div class="footer-trust__label"><strong>Secure Checkout</strong>SSL encrypted payments</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">🚚</span>
+        <div class="footer-trust__label"><strong>Free Shipping</strong>On all orders over $35</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">↩️</span>
+        <div class="footer-trust__label"><strong>30-Day Returns</strong>Hassle-free returns</div>
+      </div>
+      <div class="footer-trust__item">
+        <span class="footer-trust__icon">⭐</span>
+        <div class="footer-trust__label"><strong>Top Rated</strong>4.9 / 5 from 12,000+ readers</div>
+      </div>
+      <div class="footer-payments">
+        <span class="footer-payments__label">Payments</span>
+        <span class="footer-payment-badge">VISA</span>
+        <span class="footer-payment-badge">MC</span>
+        <span class="footer-payment-badge">AMEX</span>
+        <span class="footer-payment-badge">PayPal</span>
+        <span class="footer-payment-badge">Stripe</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Folio Bookstore · All rights reserved</span>
+      <div class="footer-bottom__links">
+        <a href="#">Terms of Use</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const em = document.getElementById("newsletterEmail").value.trim();
+      if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { showToast("Please enter a valid email."); return; }
+      showToast("📬 You're subscribed! Thanks for joining Folio.");
+      document.getElementById("newsletterEmail").value = "";
+    }
+  </script>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
